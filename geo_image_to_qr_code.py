@@ -97,6 +97,9 @@ if __name__ == '__main__':
     for i in range(len(col_dict['id'])):
         gid = col_dict['id'][i]
         gurl = col_dict['photo_url'][i]
+        gphoto = col_dict['photo_1'][i]
+        gurl = gurl + gid + '/' + gphoto
         gdesc = col_dict['description'][i]
         print 'Processing id:%s, url:%s' % (gid, gurl)
+        # Now create QR code and add info to it
         generate_sg_tag(gid, gurl, gdesc)
