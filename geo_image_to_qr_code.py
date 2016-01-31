@@ -4,10 +4,14 @@ Saves qr code in png format. name: 'id.png' ex. '1.png'
 
 For Writting text on png, use PIL
 # sudo pip install Pillow
+# sudo pip install pandas
 '''
 import csv
 import urllib
 import os
+#import pandas as pd
+from collections import defaultdict
+# Pandas could not install, so using defaultdict for now :(
 
 from PIL import Image
 from PIL import ImageFont
@@ -29,6 +33,7 @@ from PIL import ImageDraw
 root_url = 'https://chart.googleapis.com/chart?'
 width=300; height=300
 data_dir = 'data'
+src_data_path='/Users/avkadam/Google Drive/Garden/data1.csv'
 
 __author__ = "Avaneesh Kadam"
 __copyright__ = "Copyright (C) 2016 Avaneesh Kadam"
@@ -65,10 +70,33 @@ def add_header_footer(filename, gid, gdesc):
     draw.text((10, height-20), footer, (250,0,0)) # footer
     img.save(filename)
 
+def to_dict(csv_in_file):
+    ''' Convert CSV to dict for easy reference '''
+    columns = defaultdict(list) # each value in each column is appended to a list
+    with open(csv_in_file) as f:
+        reader = csv.DictReader(f) # read rows into a dictionary format
+        for row in reader: # read a row as {column1: value1, column2: value2,...}
+            for (k,v) in row.items(): # go over each column name and value 
+                columns[k].append(v) # append the value into the appropriate list
+                                     # based on column name k
+    return columns
+
+
 
 if __name__ == '__main__':
-    with open('data.csv') as f:
-        reader = csv.reader(f)
-        next(reader, None)  # skip the headers
-        for gid, gurl, gdesc in reader:
-            generate_sg_tag(gid, gurl, gdesc)
+# Processing plain old csv
+#    with open(src_data_path) as f:
+#        reader = csv.reader(f)
+#        next(reader, None)  # skip the headers
+#        for gid, gurl, gdesc in reader:
+#            generate_sg_tag(gid, gurl, gdesc)
+
+    # Convert CSV to dict for easy reference
+    col_dict = to_dict(src_data_path) 
+
+    for i in range(len(col_dict['id'])):
+        gid = col_dict['id'][i]
+        gurl = col_dict['photo_url'][i]
+        gdesc = col_dict['description'][i]
+        print 'Processing id:%s, url:%s' % (gid, gurl)
+        generate_sg_tag(gid, gurl, gdesc)
